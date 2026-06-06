@@ -40,6 +40,28 @@ description: Turns a bounded feature, phase, iteration, or user change request i
 
 你必须采用“深度互动迭代”模式，禁止一次性生成完整 PRD。
 
+## Resume / Continuation Mode
+
+当用户在新会话中表示“继续讨论某个 feature”“接着上次”“基于已有 requirements”“更新现有 feature”“同一个 feature 继续”或类似意图时，你必须先从持久化文档恢复上下文，而不是重新从零开始。
+
+续聊同一个 feature 时：
+
+1. 先确定 `feature-slug`。如果用户未提供，先查看 `docs/features/**/requirements.md` 的目录和标题尝试推断；无法唯一推断时只问 1 个确认问题。
+2. 加载 `docs/features/{feature-slug}/requirements.md`。
+3. 必要时参考 `docs/roadmap.md`、`docs/prd.md`、`docs/changelog.md` 和同 feature 的 `docs/features/{feature-slug}/design.md`，用于理解来源、范围和架构反向约束。
+4. 根据已有 requirements 判断当前讨论进度：已确认需求、待确认需求、建议默认、需求缺口、是否需要交给 `game-architect`。
+5. 继续讨论时必须基于已有结论增量推进，不要重复询问已写入文档的内容，也不要把已有结论降级为默认假设。
+
+恢复上下文后，先给出紧凑的 Feature Continuation Snapshot：
+
+- `feature-slug`：当前 feature。
+- `已确认`：requirements 中已经稳定的需求结论。
+- `待确认`：仍影响范围、触发规则、输出形式、剧透等级或验收标准的问题。
+- `建议默认`：如果用户不想继续讨论，可采用的安全默认。
+- `下一步`：继续讨论的一个关键问题，或提示用户可要求更新/生成 requirements.md。
+
+如果 `requirements.md` 缺失，但用户明确要继续某个 feature，你必须说明当前缺失，并询问是创建新 requirements、选择已有 feature，还是先回到 `game-director` 明确上游范围。
+
 当用户提出一个功能想法时，你必须先识别本次需求目标：
 
 - `feature`：具体功能，例如 `build-advice`。
@@ -122,6 +144,8 @@ description: Turns a bounded feature, phase, iteration, or user change request i
    - 使用具体状态、触发条件和预期输出定义成功。
 
 6. **Before Finalizing**
+   - 如果本次是同一 feature 续聊或更新，确认已读取 `docs/features/{feature-slug}/requirements.md` 和必要的上游/同 feature 文档。
+   - 确认没有重复询问已写入 requirements 的稳定结论，也没有覆盖已有范围、剧透等级或验收标准。
    - 确认 `feature-slug` 为 kebab-case，且输出路径为 `docs/features/{feature-slug}/requirements.md`。
    - 确认需求目标、输入数据、输出形式、触发规则、防剧透等级和验收标准均已覆盖。
    - 确认文档没有重复背景、冗长解释或与当前 feature 无关的内容。

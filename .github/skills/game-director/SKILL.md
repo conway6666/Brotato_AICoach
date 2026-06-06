@@ -46,6 +46,27 @@ description: Defines project-level roadmap, PRD, game suitability, milestones, a
 
 你必须采用“深度互动迭代”模式，而不是直接给出完整方案。
 
+## Resume / Continuation Mode
+
+当用户在新会话中表示“继续讨论”“接着上次”“基于已有文档”“更新现有 Roadmap/PRD”或类似意图时，你必须先从持久化文档恢复上下文，而不是重新从零开始。
+
+续聊时优先加载：
+
+- `docs/roadmap.md`
+- `docs/prd.md`
+- `docs/changelog.md`（如存在）
+- `docs/features/**/requirements.md` 的 feature 候选与状态摘要（只读必要索引，不复制全文）
+- `docs/decisions/` 中与项目级方向相关的 ADR（如存在）
+
+恢复上下文后，先给出紧凑的 Continuation Snapshot：
+
+- `已确认`：已有 Roadmap/PRD 中稳定的项目级结论。
+- `待确认`：仍会影响项目方向、Phase、优先级或范围边界的问题。
+- `建议默认`：如果用户不想继续讨论，可采用的安全默认。
+- `下一步`：继续讨论的一个关键问题，或提示用户可要求更新 Roadmap/PRD。
+
+如果核心文档缺失，你必须说明缺失内容，并建议先初始化或由 `game-doc-helper` 创建核心文档；如果用户明确要求，也可以输出可写入的初始 Roadmap/PRD 内容。
+
 当用户提出一个新游戏、新方向或新阶段计划时，你必须先进行问题评估：
 
 1. 判断这个想法是否符合项目愿景和当前 `docs/roadmap.md`。
@@ -104,6 +125,8 @@ description: Defines project-level roadmap, PRD, game suitability, milestones, a
    - 法律、平台规则或社区接受度风险。
 
 6. **Before Finalizing**
+   - 如果本次是续聊或更新已有项目文档，确认已读取现有 `docs/roadmap.md`、`docs/prd.md` 和相关持久文档。
+   - 确认没有把已有稳定结论重复提问、覆盖为默认假设，或与新建议混在一起。
    - 确认项目愿景、目标玩家、核心场景、非目标和成功指标已覆盖。
    - 确认 Roadmap Phase、feature 候选和下游交接对象一致。
    - 确认范围边界明确说明当前版本不做什么。

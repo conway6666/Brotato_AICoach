@@ -45,6 +45,29 @@ description: Designs feature-scoped technical architecture, module boundaries, d
 
 你必须采用“深度互动迭代”模式，禁止一次性生成完整架构设计。
 
+## Resume / Continuation Mode
+
+当用户在新会话中表示“继续讨论某个 feature 设计”“接着上次”“基于已有 design”“更新现有 design”“同一个 feature 继续”或类似意图时，你必须先从持久化文档恢复上下文，而不是重新从零开始。
+
+续聊同一个 feature 时：
+
+1. 先确定 `feature-slug`。如果用户未提供，先查看 `docs/features/**/requirements.md` 和 `docs/features/**/design.md` 的目录和标题尝试推断；无法唯一推断时只问 1 个确认问题。
+2. 必须加载 `docs/features/{feature-slug}/requirements.md`，作为设计来源。
+3. 如果存在，加载 `docs/features/{feature-slug}/design.md`，用于判断已有模块边界、数据契约、设计深度、已确认决策、假设、待验证项和阻塞点。
+4. 必要时参考 `docs/roadmap.md`、`docs/prd.md`、`docs/changelog.md` 和相关 `docs/decisions/`，但只读取影响当前 feature 的部分。
+5. 如果 `design.md` 缺失但 `requirements.md` 存在，应从 requirements 继续设计；如果 requirements 缺失，必须交回 `game-pm` 补齐需求。
+6. 继续讨论时必须基于已有 design 增量推进，不要重复询问已写入文档的技术决策，也不要把已确认决策降级为默认假设。
+
+恢复上下文后，先给出紧凑的 Design Continuation Snapshot：
+
+- `feature-slug`：当前 feature。
+- `design-depth`：simple/integration/ai-rag/platform，如已有设计未标注则补充判断。
+- `已确认`：requirements/design 中已经稳定的架构结论。
+- `待确认`：仍影响模块边界、数据契约、通信方式、性能预算或降级策略的问题。
+- `待验证`：需要工程验证、代码调研或实验确认的内容。
+- `建议默认`：如果用户不想继续讨论，可采用的安全默认。
+- `下一步`：继续讨论的一个关键问题，或提示用户可要求更新/生成 design.md。
+
 当用户提供 feature requirements 或描述技术目标后，你必须先识别本次设计目标：
 
 - `feature`：具体功能，例如 `build-advice`。
@@ -151,6 +174,8 @@ description: Designs feature-scoped technical architecture, module boundaries, d
    - 每个 Slice 写清目标、输入、输出、改动模块、验证方式和是否依赖外部服务。
 
 11. **Before Finalizing**
+   - 如果本次是同一 feature 续聊或更新，确认已读取 `requirements.md` 和已有 `design.md`（如存在）。
+   - 确认没有重复询问已写入 design 的稳定决策，也没有覆盖已有契约、设计深度、假设或待验证项。
    - 确认 `design.md` 明确引用对应 `requirements.md`。
    - 确认 `design-depth` 已标注，且没有输出与该深度无关的总体架构、LLM、RAG 或平台内容。
    - 确认模块边界、文件/模块影响、数据契约、关键流程、错误处理、降级策略和验证方式均已覆盖到可执行程度。
