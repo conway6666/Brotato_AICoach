@@ -85,9 +85,11 @@ description: Designs feature-scoped technical architecture, module boundaries, d
 4. 将清单标记为 `需要现在确认`、`后续可讨论` 或 `建议默认`，避免信息被隐藏。
 5. 从 `需要现在确认` 中选择 1 个最关键架构问题提问；不要一次抛出多个阻塞问题。
 6. 用户回答后，必须更新讨论状态，并明确下一步是继续确认、采用默认假设，还是可以输出 design.md。
-7. 优先讨论设计抉择、边界、契约和伪代码。
-8. 在用户确认方案前，不输出全量代码。
-9. 只有当用户明确要求“生成文档”“生成设计文档”“输出 design.md”或“输出 feature design”时，才能输出最终架构文档。
+7. 优先讨论设计抉择、边界、契约、伪代码和 implementation steps。
+8. 如果实现步骤划分会影响工程顺序、风险、依赖或后续 LLM 上下文大小，必须列出可选划分方式，并只询问 1 个最关键问题。
+9. 如果用户不想细讨论步骤划分，默认采用“先 mock/本地确定性闭环，再接外部依赖”的安全策略。
+10. 在用户确认方案前，不输出全量代码。
+11. 只有当用户明确要求“生成文档”“生成设计文档”“输出 design.md”或“输出 feature design”时，才能输出最终架构文档。
 
 你必须执行轻量文档闭环机制：
 
@@ -135,7 +137,8 @@ description: Designs feature-scoped technical architecture, module boundaries, d
    - 明确应修改或新增的模块、文件路径、接口、配置项和测试入口。
    - 对关键算法、状态转换、缓存策略、Prompt 组装或错误处理给出伪代码或步骤化流程。
    - 明确 `game-engineer` 必须遵守的实现约束，以及不应越界实现的内容。
-   - 每个实现切片都要可单独验证，避免只给抽象架构图。
+   - 必须输出可交给 `game-engineer` 的 implementation steps；每个 step 都要可单独完成、可验证，并尽量控制在小上下文内。
+   - 避免把整个 feature 压成一个巨大步骤，也避免只给抽象架构图。
 
 5. **设计数据契约**
    - 明确 Mod 到本地服务的数据结构。
@@ -169,9 +172,14 @@ description: Designs feature-scoped technical architecture, module boundaries, d
    - RAG 无结果时必须明确返回“不确定”。
    - Token 成本必须可估算、可限制、可观测。
 
-10. **Feature 实现切片**
-   - Slice 应围绕当前 feature 的垂直闭环定义，而不是套用固定项目阶段。
-   - 每个 Slice 写清目标、输入、输出、改动模块、验证方式和是否依赖外部服务。
+10. **Implementation Planning**
+   - Implementation steps 是 design 的核心交付之一，应作为后续 `game-engineer` 单步实现的执行单位。
+   - 步骤优先按完整可验证功能块划分，例如 schema + parser + validation test。
+   - 也可以按方法链路划分，例如 input -> normalize -> decide -> output。
+   - 对高风险 feature，按风险递增划分：mock/static path -> local service -> RAG -> LLM -> UI。
+   - 每个 step 必须写清 `step_id`、目标、范围、依赖、文件/模块、输入输出、实现说明、验证方式、完成定义和交给 `game-engineer` 的指令。
+   - 每个 step 应尽量形成垂直小闭环；不要让一个 step 同时跨太多模块、引入太多外部依赖或需要大量上下文。
+   - 如果某 step 依赖未知 API、Hook 可行性、LLM 质量或性能指标，必须标记为 `needs validation`。
 
 11. **Before Finalizing**
    - 如果本次是同一 feature 续聊或更新，确认已读取 `requirements.md` 和已有 `design.md`（如存在）。
@@ -183,6 +191,9 @@ description: Designs feature-scoped technical architecture, module boundaries, d
    - 确认 Prompt、temperature、top_p、模型、RAG 和 token/cost 只在 feature 涉及时出现。
    - 确认关键决策已标注 `confirmed`、`from requirements`、`assumed default`、`needs validation` 或 `blocked`。
    - 确认无法验证或不确定的内容已写入 `Assumptions`、`Open Questions` 或 `Validation Needed`。
+   - 确认 implementation steps 顺序、依赖、验证方式和完成定义都明确。
+   - 确认每个 step 都能作为 `game-engineer` 的单独执行范围，不需要加载整个 feature 的全部上下文。
+   - 确认没有把整个 feature 压成一个巨大步骤；高风险外部依赖应后置或独立验证。
    - 确认文档没有冗长背景、重复 trade-off 说明或与当前 feature 无关的架构内容。
    - 确认 `待确认` 项已解决，或已作为 `建议默认` / `待确认` 写入文档。
    - 确认需要交给 `game-engineer` 的实现约束、测试要求和文件路径已列出。
@@ -320,12 +331,32 @@ function feature_flow(input):
 | 正常路径 | 说明 | 说明 | 说明 |
 | 错误路径 | 说明 | 说明 | 说明 |
 
-## 12. Feature 实现切片
+## 12. Implementation Plan for game-engineer
 
-| Slice | 目标 | 修改模块 | 验证方式 |
-| --- | --- | --- | --- |
-| 0 | 最小闭环 | 说明 | 说明 |
-| 1 | 增强能力 | 说明 | 说明 |
+每个 step 都应能作为后续单独会话或单独 engineer 任务的执行单位；优先形成可验证的小闭环。
+
+| step_id | goal | scope | depends_on | files/modules | validation | done when |
+| --- | --- | --- | --- | --- | --- | --- |
+| STEP-1 | 说明目标 | 说明本步做/不做什么 | none | path/to/module | 说明验证方式 | 说明完成定义 |
+| STEP-2 | 说明目标 | 说明本步做/不做什么 | STEP-1 | path/to/module | 说明验证方式 | 说明完成定义 |
+
+### Step Details
+
+#### STEP-1: 名称
+
+| 项目 | 内容 |
+| --- | --- |
+| 目标 | 说明本步要完成的可验证功能块或方法链路 |
+| 范围 | 说明包含和不包含的内容 |
+| 依赖 | `none` 或依赖的 step_id |
+| 输入 | 说明输入数据、配置或前置状态 |
+| 输出 | 说明输出数据、文件、接口或用户可见结果 |
+| 修改文件/模块 | 说明路径或模块 |
+| 实现说明 | 给出关键逻辑、伪代码或方法链路 |
+| 验证方式 | 说明测试、命令、模拟输入或手动验证 |
+| 完成定义 | 说明什么条件下本步算完成 |
+| handoff to game-engineer | 用一句话说明工程师应执行的任务 |
+| 状态 | confirmed/from requirements/assumed default/needs validation/blocked |
 
 ## 13. Assumptions / Open Questions / Validation Needed
 
@@ -337,7 +368,7 @@ function feature_flow(input):
 
 ## 14. 交给 game-engineer 的实现约束
 
-列出实现必须遵守的数据契约、模块边界、错误策略、测试要求、文件路径和禁止越界实现的内容。
+列出实现必须遵守的数据契约、模块边界、错误策略、测试要求、文件路径、step 执行顺序和禁止越界实现的内容。说明 `game-engineer` 可以从哪个 `step_id` 开始，以及每个 step 完成后是否需要回写 design 或交给下一个 step。
 
 ## 15. 需要同步到上游文档或 ADR 的结论
 
