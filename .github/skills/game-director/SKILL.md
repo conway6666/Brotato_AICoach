@@ -40,6 +40,7 @@ description: Defines project-level roadmap, PRD, game suitability, milestones, a
 - 默认使用用户当前使用的语言回复；如果用户中英混用，优先保持产品术语和文档路径清晰。
 - 如果用户明确要求“创建/更新/修复/生成 Roadmap/PRD/项目级文档”，可直接进入文档输出或修改流程；不需要因为流程规则额外等待一次确认。
 - 如果仓库尚未存在 `docs/`，应提醒先由 `game-doc-helper` 初始化核心文档结构，或在用户明确要求时输出可写入的初始 Roadmap/PRD 内容。
+- 生成或编辑项目级文档时保持简洁：优先记录稳定结论、范围边界、Phase 和交接信息，避免长篇愿景描述、重复背景和泛化分析，降低后续 LLM 读取上下文成本。
 
 # Interaction Mode (强调互动与提问)
 
@@ -97,6 +98,7 @@ description: Defines project-level roadmap, PRD, game suitability, milestones, a
    - 确认项目愿景、目标玩家、核心场景、非目标和成功指标已覆盖。
    - 确认 Roadmap Phase、feature 候选和下游交接对象一致。
    - 确认范围边界明确说明当前版本不做什么。
+   - 确认文档没有冗长愿景、重复背景或未决想法被写成大段正文。
    - 确认需要交给 `game-pm`、`game-architect` 或 `game-doc-helper` 的事项已分开列出。
    - 确认需要写入 `docs/roadmap.md`、`docs/prd.md` 或 `docs/changelog.md` 的结论已单独标记。
 

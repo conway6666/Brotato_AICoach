@@ -37,6 +37,7 @@ description: Implements bounded AI game companion mod features according to docs
 - 默认使用用户当前使用的语言回复；代码、路径、API 名称和错误信息保持原文准确。
 - 如果用户明确要求实现、修复或验证某个 feature，先读取 feature 文档和现有代码；只有在需求或设计确实缺失且无法安全推断时才阻塞。
 - 如果仓库尚未存在 `docs/` 或目标 feature 文档，应说明缺失内容，并建议先交给 `game-pm`、`game-architect` 或 `game-doc-helper` 补齐。
+- 生成工程交付说明或文档回写建议时保持简洁：聚焦修改范围、关键实现、验证方式和需要回写的结论，避免复制大量需求/设计原文或展开无关实现细节，降低后续 LLM 读取上下文成本。
 
 # Interaction Mode (强调互动与提问)
 
@@ -112,6 +113,7 @@ description: Implements bounded AI game companion mod features according to docs
    - 确认实现范围严格对应当前 `requirements.md` 与 `design.md`。
    - 确认数据契约、错误处理、超时、限频和降级行为与 design 一致。
    - 确认新增或修改的关键路径具备可执行验证方式。
+   - 确认交付说明简洁，不重复粘贴需求文档、设计文档或无关代码细节。
    - 确认需要回写 feature 文档、ADR、`docs/roadmap.md`、`docs/prd.md` 或 `docs/changelog.md` 的实现发现已单独标记。
 
 # Final Output (Markdown 结构)

@@ -34,6 +34,7 @@ description: Turns a bounded feature, phase, iteration, or user change request i
 - 默认使用用户当前使用的语言回复；如果用户中英混用，优先保持双语术语清晰。
 - 如果用户明确要求“创建/更新/修复/生成 requirements.md”，可直接进入文档输出或修改流程；不需要因为流程规则额外等待一次确认。
 - 如果仓库尚未存在 `docs/` 或目标 feature 目录，应提醒先由 `game-doc-helper` 初始化核心文档结构，或在用户明确要求时创建当前 feature 所需目录。
+- 生成或编辑文档时保持简洁：在逻辑清晰、验收条件明确的前提下，优先使用短段落、表格和要点，避免长篇背景、重复解释和聊天式叙述，降低后续 LLM 读取上下文成本。
 
 # Interaction Mode (强调互动与提问)
 
@@ -115,6 +116,7 @@ description: Turns a bounded feature, phase, iteration, or user change request i
 5. **Before Finalizing**
    - 确认 `feature-slug` 为 kebab-case，且输出路径为 `docs/features/{feature-slug}/requirements.md`。
    - 确认需求目标、输入数据、输出形式、触发规则、防剧透等级和验收标准均已覆盖。
+   - 确认文档没有重复背景、冗长解释或与当前 feature 无关的内容。
    - 确认需要交给 `game-architect` 的约束已列出。
    - 确认需要上卷到 `docs/roadmap.md`、`docs/prd.md` 或 `docs/changelog.md` 的结论已单独标记。
 

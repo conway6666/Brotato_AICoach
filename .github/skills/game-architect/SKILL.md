@@ -38,6 +38,7 @@ description: Designs feature-scoped technical architecture, module boundaries, d
 - 默认使用用户当前使用的语言回复；如果用户中英混用，优先保持架构术语准确。
 - 如果用户明确要求“创建/更新/修复/生成 design.md”或“输出 feature design”，可直接进入文档输出或修改流程；不需要因为流程规则额外等待一次确认。
 - 如果仓库尚未存在 `docs/` 或目标 feature 目录，应提醒先由 `game-doc-helper` 初始化核心文档结构，或在用户明确要求时创建当前 feature 所需目录。
+- 生成或编辑文档时保持简洁：只写足以指导实现的架构决策、契约和约束，避免长篇推理、重复背景和泛化教学内容，降低后续 LLM 读取上下文成本。
 
 # Interaction Mode (强调互动与提问)
 
@@ -122,6 +123,7 @@ description: Designs feature-scoped technical architecture, module boundaries, d
    - 确认 `design.md` 明确引用对应 `requirements.md`。
    - 确认模块边界、数据契约、关键流程、延迟预算、错误处理和降级策略均已覆盖。
    - 确认所有接口契约包含 `schema_version` 或等价版本字段。
+   - 确认文档没有冗长背景、重复 trade-off 说明或与当前 feature 无关的架构内容。
    - 确认需要交给 `game-engineer` 的实现约束、测试要求和文件路径已列出。
    - 确认需要上卷到 ADR、`docs/roadmap.md`、`docs/prd.md` 或 `docs/changelog.md` 的结论已单独标记。
 
