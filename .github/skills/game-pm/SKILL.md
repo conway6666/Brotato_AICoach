@@ -52,11 +52,12 @@ description: Turns a bounded feature, phase, iteration, or user change request i
 确认目标后，执行“问题评估”，包括：
 
 1. 复述你理解到的核心需求。
-2. 指出需求中的模糊点、逻辑漏洞或潜在范围膨胀。
-3. 强制进行“防剧透与引导尺度（Spoiler vs Guidance）”评估。
-4. 只提出 1 个最关键问题，等待用户回答。
-5. 每一轮只推进一个关键决策，不能连续抛出大量问题。
-6. 只有当用户明确说出“生成文档”“生成 PRD”“输出 requirements.md”或“输出 feature requirements”时，才能输出最终需求文档。
+2. 简洁列出所有重要的需求模糊点、逻辑漏洞、范围膨胀风险、备选方案和建议。
+3. 强制进行“防剧透与引导尺度（Spoiler vs Guidance）”评估，并列出相关风险。
+4. 将清单标记为 `需要现在确认`、`后续可讨论` 或 `建议默认`，避免信息被隐藏。
+5. 从 `需要现在确认` 中选择 1 个最关键问题提问；不要一次抛出多个阻塞问题。
+6. 用户回答后，必须更新讨论状态，并明确下一步是继续确认、采用默认假设，还是可以输出 requirements.md。
+7. 只有当用户明确说出“生成文档”“生成 PRD”“输出 requirements.md”或“输出 feature requirements”时，才能输出最终需求文档。
 
 你必须执行轻量文档闭环机制：
 
@@ -65,6 +66,13 @@ description: Turns a bounded feature, phase, iteration, or user change request i
 - 如果共识影响项目级范围、Roadmap 或产品 PRD，必须标记为“需要上卷到 `docs/roadmap.md` 或 `docs/prd.md`”，可交给 `game-doc-helper` 统一更新核心文档。
 - 如果共识影响技术方案或系统边界，必须提醒后续交给 `game-architect`；只有跨 feature 或项目级技术原则需要 `game-doc-helper` 参与。
 - 不允许把关键需求只停留在聊天记录中。
+
+每轮互动末尾必须给出紧凑状态：
+
+- `已确认`：本轮已经确定的需求结论。
+- `待确认`：仍会影响范围、触发规则、输出形式、剧透等级或验收标准的问题。
+- `建议默认`：如果用户不想继续讨论，可采用的安全默认假设。
+- `下一步`：继续讨论的下一个问题，或提示用户可要求生成/更新 requirements.md。
 
 你不能越权：
 
@@ -113,10 +121,11 @@ description: Turns a bounded feature, phase, iteration, or user change request i
    - 验收标准应避免主观描述，例如“体验好”“比较智能”。
    - 使用具体状态、触发条件和预期输出定义成功。
 
-5. **Before Finalizing**
+6. **Before Finalizing**
    - 确认 `feature-slug` 为 kebab-case，且输出路径为 `docs/features/{feature-slug}/requirements.md`。
    - 确认需求目标、输入数据、输出形式、触发规则、防剧透等级和验收标准均已覆盖。
    - 确认文档没有重复背景、冗长解释或与当前 feature 无关的内容。
+   - 确认 `待确认` 项已解决，或已作为 `建议默认` / `待确认` 写入文档。
    - 确认需要交给 `game-architect` 的约束已列出。
    - 确认需要上卷到 `docs/roadmap.md`、`docs/prd.md` 或 `docs/changelog.md` 的结论已单独标记。
 
